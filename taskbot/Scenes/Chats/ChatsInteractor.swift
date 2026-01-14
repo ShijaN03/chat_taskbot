@@ -19,9 +19,7 @@ final class ChatsInteractor: ChatsInteractorInputProtocol {
     }
         
     func fetchChats() {
-        // Skip API if not authenticated
         guard KeychainService.shared.isAuthenticated else {
-            print("⚠️ Not authenticated - cannot load chats")
             presenter?.didFetchChats([])
             return
         }
@@ -29,7 +27,6 @@ final class ChatsInteractor: ChatsInteractorInputProtocol {
         Task {
             do {
                 let apiChats = try await worker.fetchChats()
-                print("📱 Loaded \(apiChats.count) chats from API")
                 let entities = apiChats.map { mapToEntity($0) }
                 allChats = entities
                 
@@ -37,7 +34,6 @@ final class ChatsInteractor: ChatsInteractorInputProtocol {
                     presenter?.didFetchChats(entities)
                 }
             } catch {
-                print("❌ Failed to load chats: \(error.localizedDescription)")
                 await MainActor.run {
                     presenter?.didFetchChats([])
                 }
@@ -74,7 +70,6 @@ final class ChatsInteractor: ChatsInteractorInputProtocol {
                     presenter?.didFetchChats(entities)
                 }
             } catch {
-                print("❌ Failed to load archived chats: \(error.localizedDescription)")
                 await MainActor.run {
                     presenter?.didFetchChats([])
                 }
@@ -83,32 +78,26 @@ final class ChatsInteractor: ChatsInteractorInputProtocol {
     }
     
     func markChatAsRead(chatId: String) {
+        guard let intId = Int(chatId) else { return }
         Task {
             do {
-                try await worker.markChatRead(chatId: chatId)
+                try await worker.markChatRead(chatId: intId)
                 await MainActor.run {
                     presenter?.didMarkChatAsRead(chatId: chatId)
                 }
-            } catch {
-                await MainActor.run {
-                    presenter?.didMarkChatAsRead(chatId: chatId)
-                }
-            }
+            } catch { }
         }
     }
     
     func archiveChat(chatId: String) {
+        guard let intId = Int(chatId) else { return }
         Task {
             do {
-                try await worker.archiveChat(chatId: chatId)
+                try await worker.archiveChat(chatId: intId)
                 await MainActor.run {
                     presenter?.didArchiveChat(chatId: chatId)
                 }
-            } catch {
-                await MainActor.run {
-                    presenter?.didArchiveChat(chatId: chatId)
-                }
-            }
+            } catch { }
         }
     }
     
@@ -121,17 +110,14 @@ final class ChatsInteractor: ChatsInteractorInputProtocol {
     }
     
     func deleteChat(chatId: String) {
+        guard let intId = Int(chatId) else { return }
         Task {
             do {
-                try await worker.deleteChat(chatId: chatId)
+                try await worker.deleteChat(chatId: intId)
                 await MainActor.run {
                     presenter?.didDeleteChat(chatId: chatId)
                 }
-            } catch {
-                await MainActor.run {
-                    presenter?.didDeleteChat(chatId: chatId)
-                }
-            }
+            } catch { }
         }
     }
     
@@ -141,10 +127,10 @@ final class ChatsInteractor: ChatsInteractorInputProtocol {
         var lastMessage: ChatMessage? = nil
         if let apiMessage = api.lastMessage {
             lastMessage = ChatMessage(
-                id: apiMessage.id,
-                senderId: apiMessage.senderId ?? "",
+                id: apiMessage.id ?? 0,
+                senderId: apiMessage.senderId ?? 0,
                 content: apiMessage.content ?? "",
-                type: mapMessageType(apiMessage.type),
+                type: .text,
                 createdAt: dateFormatter.date(from: apiMessage.createdAt ?? "") ?? Date(),
                 isRead: apiMessage.isRead ?? true
             )
@@ -152,109 +138,15 @@ final class ChatsInteractor: ChatsInteractorInputProtocol {
         
         return ChatEntity(
             id: api.id,
-            recipientId: api.recipientId ?? "",
-            recipientName: api.recipientName ?? "Unknown",
-            recipientAvatarURL: api.recipientAvatar,
-            isVerified: api.recipientVerified ?? false,
+            recipientId: api.otherUser?.id ?? 0,
+            recipientName: api.otherUser?.name ?? api.name ?? "Unknown",
+            recipientAvatarURL: api.otherUser?.avatarUrl ?? api.avatarUrl,
+            isVerified: false,
             isOnline: false,
             lastMessage: lastMessage,
             unreadCount: api.unreadCount ?? 0,
-            updatedAt: dateFormatter.date(from: api.updatedAt ?? "") ?? Date(),
-            isArchived: api.isArchived ?? false
+            updatedAt: Date(),
+            isArchived: api.isInInbox != true
         )
-    }
-    
-    private func mapMessageType(_ type: String?) -> ChatMessageType {
-        switch type {
-        case "photo": return .photo
-        case "video": return .video
-        case "voice": return .voice
-        case "location": return .location
-        case "publication": return .publication
-        default: return .text
-        }
-    }
-        
-    private func createMockChats() -> [ChatEntity] {
-        let now = Date()
-        
-        return [
-            ChatEntity(
-                id: "1",
-                recipientId: "user1",
-                recipientName: "nogotochki_48",
-                recipientAvatarURL: "https://picsum.photos/seed/user1/100/100",
-                isVerified: false,
-                isOnline: true,
-                lastMessage: ChatMessage(
-                    id: "m1",
-                    senderId: "user1",
-                    content: "Приходите)",
-                    type: .text,
-                    createdAt: now,
-                    isRead: false
-                ),
-                unreadCount: 0,
-                updatedAt: now,
-                isArchived: false
-            ),
-            ChatEntity(
-                id: "2",
-                recipientId: "user2",
-                recipientName: "Lera234",
-                recipientAvatarURL: "https://picsum.photos/seed/user2/100/100",
-                isVerified: false,
-                isOnline: false,
-                lastMessage: ChatMessage(
-                    id: "m2",
-                    senderId: "user2",
-                    content: "Отправил публикацию",
-                    type: .publication,
-                    createdAt: now.addingTimeInterval(-3600),
-                    isRead: false
-                ),
-                unreadCount: 25,
-                updatedAt: now.addingTimeInterval(-3600),
-                isArchived: false
-            ),
-            ChatEntity(
-                id: "3",
-                recipientId: "user3",
-                recipientName: "servise_car666",
-                recipientAvatarURL: "https://picsum.photos/seed/user3/100/100",
-                isVerified: true,
-                isOnline: false,
-                lastMessage: ChatMessage(
-                    id: "m3",
-                    senderId: "user3",
-                    content: "Хорошо, договорились!",
-                    type: .text,
-                    createdAt: now.addingTimeInterval(-7200),
-                    isRead: true
-                ),
-                unreadCount: 0,
-                updatedAt: now.addingTimeInterval(-7200),
-                isArchived: false
-            ),
-            ChatEntity(
-                id: "4",
-                recipientId: "user4",
-                recipientName: "kristina2022",
-                recipientAvatarURL: "https://picsum.photos/seed/user4/100/100",
-                isVerified: false,
-                isOnline: false,
-                lastMessage: ChatMessage(
-                    id: "m4",
-                    senderId: "me",
-                    content: "Просмотрено 1 ч. назад",
-                    type: .text,
-                    createdAt: now.addingTimeInterval(-3600),
-                    isRead: true
-                ),
-                unreadCount: 0,
-                updatedAt: now.addingTimeInterval(-3600),
-                isArchived: false
-            )
-        ]
     }
 }

@@ -163,10 +163,10 @@ final class ChatsViewController: UIViewController, ChatsViewProtocol {
         setupUI()
         presenter?.viewDidLoad()
         
-        // TODO: Enable when WebSocket endpoint is confirmed
-        // if KeychainService.shared.isAuthenticated {
-        //     setupChatWebSocket()
-        // }
+        // Enable WebSocket for real-time messages
+        if KeychainService.shared.isAuthenticated {
+            setupChatWebSocket()
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {

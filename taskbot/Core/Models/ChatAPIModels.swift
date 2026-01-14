@@ -6,40 +6,65 @@
 //
 
 import Foundation
-struct ChatListResponse: Codable {
+
+struct ChatsResponse: Codable {
+    let count: Int?
     let chats: [ChatAPIModel]?
-    let items: [ChatAPIModel]?
-    
-    var allChats: [ChatAPIModel] {
-        return chats ?? items ?? []
-    }
 }
 
 struct ChatAPIModel: Codable {
-    let id: String
-    let recipientId: String?
-    let recipientName: String?
-    let recipientAvatar: String?
-    let recipientVerified: Bool?
-    let lastMessage: MessageAPIModel?
+    let id: Int
+    let type: String?
+    let name: String?
+    let avatarUrl: String?
+    let otherUser: OtherUserModel?
+    let lastMessage: LastMessageModel?
     let unreadCount: Int?
-    let isArchived: Bool?
+    let isInInbox: Bool?
+    let inboxReason: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case id, type, name
+        case avatarUrl = "avatar_url"
+        case otherUser = "other_user"
+        case lastMessage = "last_message"
+        case unreadCount = "unread_count"
+        case isInInbox = "is_in_inbox"
+        case inboxReason = "inbox_reason"
+    }
+}
+
+struct OtherUserModel: Codable {
+    let id: Int
+    let name: String?
+    let avatarUrl: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case id, name
+        case avatarUrl = "avatar_url"
+    }
+}
+
+struct LastMessageModel: Codable {
+    let id: Int?
+    let senderId: Int?
+    let content: String?
+    let videoId: Int?
+    let nomenclatureId: String?
     let createdAt: String?
-    let updatedAt: String?
+    let isRead: Bool?
     
     enum CodingKeys: String, CodingKey {
         case id
-        case recipientId = "recipient_id"
-        case recipientName = "recipient_name"
-        case recipientAvatar = "recipient_avatar"
-        case recipientVerified = "recipient_verified"
-        case lastMessage = "last_message"
-        case unreadCount = "unread_count"
-        case isArchived = "is_archived"
+        case senderId = "sender_id"
+        case content
+        case videoId = "video_id"
+        case nomenclatureId = "nomenclature_id"
         case createdAt = "created_at"
-        case updatedAt = "updated_at"
+        case isRead = "is_read"
     }
 }
+
 struct MessagesResponse: Codable {
     let messages: [MessageAPIModel]?
     let items: [MessageAPIModel]?
@@ -50,36 +75,57 @@ struct MessagesResponse: Codable {
 }
 
 struct MessageAPIModel: Codable {
-    let id: String
-    let chatId: String?
-    let senderId: String?
+    let id: Int
+    let senderId: Int?
     let content: String?
-    let type: String?
-    let mediaUrl: String?
-    let replyToId: String?
-    let isRead: Bool?
+    let videoId: Int?
+    let nomenclatureId: String?
     let createdAt: String?
+    let isRead: Bool?
     
     enum CodingKeys: String, CodingKey {
         case id
-        case chatId = "chat_id"
         case senderId = "sender_id"
         case content
-        case type
-        case mediaUrl = "media_url"
-        case replyToId = "reply_to_id"
-        case isRead = "is_read"
+        case videoId = "video_id"
+        case nomenclatureId = "nomenclature_id"
         case createdAt = "created_at"
+        case isRead = "is_read"
     }
 }
+
 struct SendMessageRequest: Codable {
-    let chatId: String
+    let recipientId: Int?
+    let username: String?
     let content: String
-    let type: String
     
     enum CodingKeys: String, CodingKey {
-        case chatId = "chat_id"
+        case recipientId = "recipient_id"
+        case username
         case content
-        case type
+    }
+    
+    init(recipientId: Int, content: String) {
+        self.recipientId = recipientId
+        self.username = nil
+        self.content = content
+    }
+    
+    init(username: String, content: String) {
+        self.recipientId = nil
+        self.username = username
+        self.content = content
     }
 }
+
+struct SendMessageResponse: Codable {
+    let messageId: Int
+    let status: String
+    
+    enum CodingKeys: String, CodingKey {
+        case messageId = "message_id"
+        case status
+    }
+}
+
+struct EmptyResponse: Codable {}

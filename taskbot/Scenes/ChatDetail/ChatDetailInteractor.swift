@@ -20,19 +20,21 @@ final class ChatDetailInteractor: ChatDetailInteractorInputProtocol {
     func fetchMessages(chatId: String) {
         self.chatId = chatId
         
+        guard let intChatId = Int(chatId) else {
+            presenter?.didFetchMessages([])
+            return
+        }
+        
         Task {
             do {
-                let apiMessages = try await worker.fetchMessages(chatId: chatId)
-                print("📬 Loaded \(apiMessages.count) messages from API")
+                let apiMessages = try await worker.fetchMessages(chatId: intChatId)
                 let entities = apiMessages.map { mapToEntity($0) }
                 
                 await MainActor.run {
                     presenter?.didFetchMessages(entities)
                 }
             } catch {
-                print("❌ Failed to load messages: \(error.localizedDescription)")
                 await MainActor.run {
-                    // Show empty state instead of mock data
                     presenter?.didFetchMessages([])
                 }
             }
@@ -40,19 +42,29 @@ final class ChatDetailInteractor: ChatDetailInteractorInputProtocol {
     }
     
     func sendMessage(chatId: String, text: String) {
-        print("📤 Sending message to recipient \(chatId): \(text)")
+        guard let recipientId = Int(chatId) else { return }
         
         Task {
             do {
-                let apiMessage = try await worker.sendMessage(chatId: chatId, content: text, type: "text")
-                print("✅ Message sent successfully! ID: \(apiMessage.id)")
-                let entity = mapToEntity(apiMessage)
+                let response = try await worker.sendMessage(recipientId: recipientId, content: text)
+                
+                let message = MessageEntity(
+                    id: "\(response.messageId)",
+                    senderId: "me",
+                    isOutgoing: true,
+                    type: .text,
+                    content: text,
+                    mediaURL: nil,
+                    thumbnailURL: nil,
+                    createdAt: Date(),
+                    isRead: false,
+                    repostInfo: nil
+                )
                 
                 await MainActor.run {
-                    presenter?.didSendMessage(entity)
+                    presenter?.didSendMessage(message)
                 }
             } catch {
-                print("❌ Failed to send message: \(error.localizedDescription)")
                 await MainActor.run {
                     presenter?.didFailSendingMessage(with: error)
                 }
@@ -77,34 +89,19 @@ final class ChatDetailInteractor: ChatDetailInteractorInputProtocol {
     }
     
     func sendLocation(chatId: String, latitude: Double, longitude: Double) {
-        Task {
-            do {
-                let content = "\(latitude),\(longitude)"
-                let apiMessage = try await worker.sendMessage(chatId: chatId, content: content, type: "location")
-                let entity = mapToEntity(apiMessage)
-                
-                await MainActor.run {
-                    presenter?.didSendMessage(entity)
-                }
-            } catch {
-                let message = MessageEntity(
-                    id: UUID().uuidString,
-                    senderId: "me",
-                    isOutgoing: true,
-                    type: .location,
-                    content: "\(latitude),\(longitude)",
-                    mediaURL: nil,
-                    thumbnailURL: nil,
-                    createdAt: Date(),
-                    isRead: false,
-                    repostInfo: nil
-                )
-                
-                await MainActor.run {
-                    presenter?.didSendMessage(message)
-                }
-            }
-        }
+        let message = MessageEntity(
+            id: UUID().uuidString,
+            senderId: "me",
+            isOutgoing: true,
+            type: .location,
+            content: "\(latitude),\(longitude)",
+            mediaURL: nil,
+            thumbnailURL: nil,
+            createdAt: Date(),
+            isRead: false,
+            repostInfo: nil
+        )
+        presenter?.didSendMessage(message)
     }
     
     func loadMoreMessages(chatId: String, beforeId: String) {
@@ -114,88 +111,16 @@ final class ChatDetailInteractor: ChatDetailInteractorInputProtocol {
         let dateFormatter = ISO8601DateFormatter()
         
         return MessageEntity(
-            id: api.id,
-            senderId: api.senderId ?? "",
-            isOutgoing: api.senderId == "me",
-            type: mapMessageType(api.type),
+            id: "\(api.id)",
+            senderId: api.senderId != nil ? "\(api.senderId!)" : "",
+            isOutgoing: false,
+            type: .text,
             content: api.content ?? "",
-            mediaURL: api.mediaUrl,
+            mediaURL: nil,
             thumbnailURL: nil,
             createdAt: dateFormatter.date(from: api.createdAt ?? "") ?? Date(),
             isRead: api.isRead ?? false,
             repostInfo: nil
         )
-    }
-    
-    private func mapMessageType(_ type: String?) -> MessageType {
-        switch type {
-        case "photo": return .photo
-        case "video": return .video
-        case "voice": return .voice
-        case "location": return .location
-        case "repost": return .repost
-        default: return .text
-        }
-    }
-    
-    private func createMockMessages() -> [MessageEntity] {
-        let calendar = Calendar.current
-        let now = Date()
-        let yesterday = calendar.date(byAdding: .day, value: -1, to: now)!
-        
-        return [
-            MessageEntity(
-                id: "1",
-                senderId: "user1",
-                isOutgoing: false,
-                type: .text,
-                content: "Привет",
-                mediaURL: nil,
-                thumbnailURL: nil,
-                createdAt: yesterday,
-                isRead: true,
-                repostInfo: nil
-            ),
-            MessageEntity(
-                id: "2",
-                senderId: "user1",
-                isOutgoing: false,
-                type: .text,
-                content: "Как дела? Как съездила в отпуск?",
-                mediaURL: nil,
-                thumbnailURL: nil,
-                createdAt: yesterday,
-                isRead: true,
-                repostInfo: nil
-            ),
-            MessageEntity(
-                id: "3",
-                senderId: "me",
-                isOutgoing: true,
-                type: .text,
-                content: "Привет! Съездила хорошо, видела китов и плавала на яхте",
-                mediaURL: nil,
-                thumbnailURL: nil,
-                createdAt: yesterday,
-                isRead: true,
-                repostInfo: nil
-            ),
-            MessageEntity(
-                id: "4",
-                senderId: "me",
-                isOutgoing: true,
-                type: .repost,
-                content: "",
-                mediaURL: nil,
-                thumbnailURL: nil,
-                createdAt: yesterday,
-                isRead: true,
-                repostInfo: RepostInfo(
-                    userName: "privetcvetochek...",
-                    mediaURL: "",
-                    isVideo: true
-                )
-            )
-        ]
     }
 }

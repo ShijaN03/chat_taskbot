@@ -61,7 +61,7 @@ protocol ChatsRouterProtocol: AnyObject {
     var viewController: UIViewController? { get set }
     
     static func createModule() -> UIViewController
-    func navigateToChat(with chatId: String, userName: String)
+    func navigateToChat(with chatId: String, userName: String, avatarURL: String?)
     func navigateToNewMessage()
 }
 

@@ -44,11 +44,11 @@ protocol NewMessageRouterProtocol: AnyObject {
     var viewController: UIViewController? { get set }
     
     static func createModule() -> UIViewController
-    func navigateToChat(with userId: String, userName: String)
+    func navigateToChat(with userId: Int, userName: String, avatarURL: String?)
 }
 
 struct UserViewModel {
-    let id: String
+    let id: Int
     let username: String
     let displayName: String?
     let avatarURL: String?
@@ -57,7 +57,7 @@ struct UserViewModel {
 }
 
 struct UserEntity {
-    let id: String
+    let id: Int
     let username: String
     let displayName: String?
     let avatarURL: String?

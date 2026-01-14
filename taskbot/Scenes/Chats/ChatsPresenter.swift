@@ -29,12 +29,13 @@ final class ChatsPresenter: ChatsPresenterProtocol {
         guard index < currentChats.count else { return }
         
         let chat = currentChats[index]
+        let chatIdString = "\(chat.id)"
         
         if chat.unreadCount > 0 {
-            interactor?.markChatAsRead(chatId: chat.id)
+            interactor?.markChatAsRead(chatId: chatIdString)
         }
         
-        router?.navigateToChat(with: chat.id, userName: chat.recipientName)
+        router?.navigateToChat(with: chatIdString, userName: chat.recipientName, avatarURL: chat.recipientAvatarURL)
     }
     
     func didSearchChats(with query: String) {
@@ -96,7 +97,7 @@ final class ChatsPresenter: ChatsPresenterProtocol {
     private func mapToViewModels(_ entities: [ChatEntity]) -> [ChatViewModel] {
         return entities.map { entity in
             ChatViewModel(
-                id: entity.id,
+                id: "\(entity.id)",
                 userName: entity.recipientName,
                 avatarURL: entity.recipientAvatarURL,
                 lastMessage: formatLastMessage(entity.lastMessage),
@@ -163,7 +164,9 @@ extension ChatsPresenter: ChatsInteractorOutputProtocol {
     }
     
     func didArchiveChat(chatId: String) {
-        currentChats.removeAll { $0.id == chatId }
+        if let intId = Int(chatId) {
+            currentChats.removeAll { $0.id == intId }
+        }
         let viewModels = mapToViewModels(currentChats)
         view?.showChats(viewModels)
     }
@@ -173,7 +176,9 @@ extension ChatsPresenter: ChatsInteractorOutputProtocol {
     }
     
     func didDeleteChat(chatId: String) {
-        currentChats.removeAll { $0.id == chatId }
+        if let intId = Int(chatId) {
+            currentChats.removeAll { $0.id == intId }
+        }
         let viewModels = mapToViewModels(currentChats)
         view?.showChats(viewModels)
     }

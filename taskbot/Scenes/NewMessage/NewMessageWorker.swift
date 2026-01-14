@@ -18,21 +18,18 @@ final class NewMessageWorker: NewMessageWorkerProtocol {
     
     func searchUsers(query: String) async throws -> [UserAPIModel] {
         let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query
-        print("🔍 Searching users with query: \(query)")
         let response: UserSearchResponse = try await api.request(
-            endpoint: "/users/search?q=\(encodedQuery)",
+            endpoint: "/users/search?q=\(encodedQuery)&offset=0&limit=50",
             method: .get,
             requiresAuth: true,
             responseType: UserSearchResponse.self
         )
-        print("🔍 Found \(response.allUsers.count) users")
         return response.allUsers
     }
     
     func getRecommendedUsers() async throws -> [UserAPIModel] {
-        // Use search with empty or popular query for recommendations
         let response: UserSearchResponse = try await api.request(
-            endpoint: "/users/search",
+            endpoint: "/users/search?offset=0&limit=50",
             method: .get,
             requiresAuth: true,
             responseType: UserSearchResponse.self

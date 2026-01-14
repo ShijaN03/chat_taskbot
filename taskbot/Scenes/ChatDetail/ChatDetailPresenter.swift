@@ -120,12 +120,10 @@ extension ChatDetailPresenter: ChatDetailInteractorOutputProtocol {
     
     func didSendMessage(_ message: MessageEntity) {
         messages.append(message)
-        let viewModels = mapToViewModels([message])
+        let viewModels = mapToViewModels(messages)
         
-        if let viewModel = viewModels.first {
-            view?.appendMessage(viewModel)
-            view?.scrollToBottom(animated: true)
-        }
+        view?.showMessages(viewModels)
+        view?.scrollToBottom(animated: true)
     }
     
     func didFailSendingMessage(with error: Error) {

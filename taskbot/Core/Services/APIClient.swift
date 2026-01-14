@@ -34,20 +34,25 @@ final class APIClient {
         request.httpBody = body
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
+        
         if let sessionId = keychain.sessionId {
             request.setValue(sessionId, forHTTPHeaderField: "X-Session-ID")
         }
+        
         if requiresAuth, let accessToken = keychain.accessToken {
             request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         }
+        
         headers?.forEach { key, value in
             request.setValue(value, forHTTPHeaderField: key)
         }
+        
         let (data, response) = try await session.data(for: request)
         
         guard let httpResponse = response as? HTTPURLResponse else {
             throw APIClientError.invalidResponse
         }
+        
         if httpResponse.statusCode == 401 && requiresAuth {
             try await refreshTokenIfNeeded()
             return try await self.request(
@@ -59,17 +64,14 @@ final class APIClient {
                 responseType: responseType
             )
         }
+        
         guard (200...299).contains(httpResponse.statusCode) else {
-            // Log error response for debugging
-            if let responseString = String(data: data, encoding: .utf8) {
-                print("❌ API Error \(httpResponse.statusCode) for \(endpoint):")
-                print("   Response: \(responseString.prefix(500))")
-            }
             if let apiError = try? JSONDecoder().decode(APIError.self, from: data) {
                 throw APIClientError.apiError(apiError)
             }
             throw APIClientError.httpError(statusCode: httpResponse.statusCode)
         }
+        
         do {
             let decoder = JSONDecoder()
             return try decoder.decode(T.self, from: data)
@@ -98,6 +100,9 @@ final class APIClient {
         }
         
         guard (200...299).contains(httpResponse.statusCode) else {
+            if let apiError = try? JSONDecoder().decode(APIError.self, from: data) {
+                throw APIClientError.apiError(apiError)
+            }
             throw APIClientError.httpError(statusCode: httpResponse.statusCode)
         }
         
@@ -106,20 +111,27 @@ final class APIClient {
     
     private func refreshTokenIfNeeded() async throws {
         guard let refreshToken = keychain.refreshToken else {
+            keychain.clearAll()
             throw APIClientError.noRefreshToken
         }
         
-        let tokenResponse: TokenResponse = try await requestFormURLEncoded(
-            endpoint: "/auth/jwt/refresh/new",
-            parameters: ["token": refreshToken],
-            responseType: TokenResponse.self
-        )
-        keychain.accessToken = tokenResponse.accessToken
-        if let newRefreshToken = tokenResponse.refreshToken {
-            keychain.refreshToken = newRefreshToken
+        do {
+            let tokenResponse: TokenResponse = try await requestFormURLEncoded(
+                endpoint: "/auth/jwt/refresh/new",
+                parameters: ["token": refreshToken],
+                responseType: TokenResponse.self
+            )
+            keychain.accessToken = tokenResponse.accessToken
+            if let newRefreshToken = tokenResponse.refreshToken {
+                keychain.refreshToken = newRefreshToken
+            }
+        } catch {
+            keychain.clearAll()
+            throw error
         }
     }
 }
+
 enum HTTPMethod: String {
     case get = "GET"
     case post = "POST"
@@ -127,6 +139,7 @@ enum HTTPMethod: String {
     case patch = "PATCH"
     case delete = "DELETE"
 }
+
 enum APIClientError: Error, LocalizedError {
     case invalidResponse
     case httpError(statusCode: Int)

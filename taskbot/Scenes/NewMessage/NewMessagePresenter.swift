@@ -27,7 +27,7 @@ final class NewMessagePresenter: NewMessagePresenterProtocol {
     }
     
     func didSelectUser(_ user: UserViewModel) {
-        router?.navigateToChat(with: user.id, userName: user.username)
+        router?.navigateToChat(with: user.id, userName: user.username, avatarURL: user.avatarURL)
     }
     
     private func mapToViewModels(_ entities: [UserEntity]) -> [UserViewModel] {

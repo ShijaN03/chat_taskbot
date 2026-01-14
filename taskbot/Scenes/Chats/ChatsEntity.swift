@@ -8,8 +8,8 @@
 import Foundation
 
 struct ChatEntity: Codable {
-    let id: String
-    let recipientId: String
+    let id: Int
+    let recipientId: Int
     let recipientName: String
     let recipientAvatarURL: String?
     let isVerified: Bool
@@ -21,8 +21,8 @@ struct ChatEntity: Codable {
 }
 
 struct ChatMessage: Codable {
-    let id: String
-    let senderId: String
+    let id: Int
+    let senderId: Int
     let content: String
     let type: ChatMessageType
     let createdAt: Date

@@ -27,8 +27,8 @@ final class ChatsRouter: ChatsRouterProtocol {
         return view
     }
     
-    func navigateToChat(with chatId: String, userName: String) {
-        let chatDetailVC = ChatDetailRouter.createModule(chatId: chatId, userName: userName, avatarURL: nil)
+    func navigateToChat(with chatId: String, userName: String, avatarURL: String?) {
+        let chatDetailVC = ChatDetailRouter.createModule(chatId: chatId, userName: userName, avatarURL: avatarURL)
         viewController?.navigationController?.pushViewController(chatDetailVC, animated: true)
     }
     

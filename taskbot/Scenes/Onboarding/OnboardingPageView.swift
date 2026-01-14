@@ -117,25 +117,21 @@ final class OnboardingPageView: UIView {
         decorationsContainer.addSubview(circleView)
         
         NSLayoutConstraint.activate([
-            // Star (right side, large white)
             starView.trailingAnchor.constraint(equalTo: decorationsContainer.trailingAnchor, constant: 20),
             starView.centerYAnchor.constraint(equalTo: decorationsContainer.centerYAnchor, constant: 20),
             starView.widthAnchor.constraint(equalToConstant: 270),
             starView.heightAnchor.constraint(equalToConstant: 270),
             
-            // Headphones (left side)
             headphonesView.leadingAnchor.constraint(equalTo: decorationsContainer.leadingAnchor, constant: 30),
             headphonesView.topAnchor.constraint(equalTo: decorationsContainer.topAnchor, constant: 60),
             headphonesView.widthAnchor.constraint(equalToConstant: 200),
             headphonesView.heightAnchor.constraint(equalToConstant: 200),
             
-            // Flower (top right of headphones)
             flowerView.leadingAnchor.constraint(equalTo: headphonesView.trailingAnchor, constant: -80),
             flowerView.topAnchor.constraint(equalTo: decorationsContainer.topAnchor, constant: 40),
             flowerView.widthAnchor.constraint(equalToConstant: 70),
             flowerView.heightAnchor.constraint(equalToConstant: 70),
             
-            // Circle (under headphones)
             circleView.leadingAnchor.constraint(equalTo: headphonesView.leadingAnchor, constant: 80),
             circleView.topAnchor.constraint(equalTo: headphonesView.bottomAnchor, constant: -15),
             circleView.widthAnchor.constraint(equalToConstant: 100),
@@ -143,7 +139,6 @@ final class OnboardingPageView: UIView {
         ])
     }
     
-    // MARK: - Page 2: Photo with hearts, wave, message
     private func setupPage2() {
         progressImageView.image = UIImage(named: "ob2_progress")
         
@@ -160,19 +155,16 @@ final class OnboardingPageView: UIView {
         decorationsContainer.addSubview(messageView)
         
         NSLayoutConstraint.activate([
-            // Wave (background, full width)
             waveView.leadingAnchor.constraint(equalTo: decorationsContainer.leadingAnchor),
             waveView.trailingAnchor.constraint(equalTo: decorationsContainer.trailingAnchor),
             waveView.bottomAnchor.constraint(equalTo: decorationsContainer.bottomAnchor),
             waveView.heightAnchor.constraint(equalToConstant: 400),
             
-            // Photo (centered)
             imageView.centerXAnchor.constraint(equalTo: decorationsContainer.centerXAnchor),
             imageView.centerYAnchor.constraint(equalTo: decorationsContainer.centerYAnchor, constant: -20),
             imageView.widthAnchor.constraint(equalToConstant: 290),
             imageView.heightAnchor.constraint(equalToConstant: 260),
             
-            // Hearts (left side)
             heartBoldView.trailingAnchor.constraint(equalTo: imageView.leadingAnchor, constant: 10),
             heartBoldView.topAnchor.constraint(equalTo: imageView.topAnchor, constant: 40),
             heartBoldView.widthAnchor.constraint(equalToConstant: 50),
@@ -183,7 +175,6 @@ final class OnboardingPageView: UIView {
             heartThinView.widthAnchor.constraint(equalToConstant: 80),
             heartThinView.heightAnchor.constraint(equalToConstant: 100),
             
-            // Message (top right)
             messageView.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: -80),
             messageView.bottomAnchor.constraint(equalTo: imageView.topAnchor, constant: 60),
             messageView.widthAnchor.constraint(equalToConstant: 140),
@@ -191,7 +182,6 @@ final class OnboardingPageView: UIView {
         ])
     }
     
-    // MARK: - Page 3: Photo with wave, spiral, star
     private func setupPage3() {
         progressImageView.image = UIImage(named: "ob3_progress")
         
@@ -206,25 +196,21 @@ final class OnboardingPageView: UIView {
         decorationsContainer.addSubview(starView)
         
         NSLayoutConstraint.activate([
-            // Blue wave/star (top)
             blueStarView.topAnchor.constraint(equalTo: decorationsContainer.topAnchor, constant: 30),
             blueStarView.centerXAnchor.constraint(equalTo: decorationsContainer.centerXAnchor, constant: 20),
             blueStarView.widthAnchor.constraint(equalToConstant: 600),
             blueStarView.heightAnchor.constraint(equalToConstant: 300),
             
-            // Photo (centered)
             imageView.centerXAnchor.constraint(equalTo: decorationsContainer.centerXAnchor),
             imageView.centerYAnchor.constraint(equalTo: decorationsContainer.centerYAnchor, constant: 40),
             imageView.widthAnchor.constraint(equalToConstant: 300),
             imageView.heightAnchor.constraint(equalToConstant: 300),
             
-            // Spiral (left bottom)
             spiralView.trailingAnchor.constraint(equalTo: imageView.leadingAnchor, constant: 60),
             spiralView.topAnchor.constraint(equalTo: imageView.centerYAnchor, constant: -20),
             spiralView.widthAnchor.constraint(equalToConstant: 150),
             spiralView.heightAnchor.constraint(equalToConstant: 250),
             
-            // White star (right bottom)
             starView.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: -100),
             starView.topAnchor.constraint(equalTo: imageView.centerYAnchor, constant: 30),
             starView.widthAnchor.constraint(equalToConstant: 150),
@@ -232,7 +218,6 @@ final class OnboardingPageView: UIView {
         ])
     }
     
-    // MARK: - Page 4: Shopping woman with stars
     private func setupPage4() {
         progressImageView.image = UIImage(named: "ob4_progress")
         
@@ -245,19 +230,16 @@ final class OnboardingPageView: UIView {
         decorationsContainer.addSubview(whiteStarView)
         
         NSLayoutConstraint.activate([
-            // Blue star (top left)
             blueStarView.leadingAnchor.constraint(equalTo: decorationsContainer.leadingAnchor, constant: 20),
             blueStarView.topAnchor.constraint(equalTo: decorationsContainer.topAnchor, constant: 40),
             blueStarView.widthAnchor.constraint(equalToConstant: 160),
             blueStarView.heightAnchor.constraint(equalToConstant: 160),
             
-            // Photo (centered)
             imageView.centerXAnchor.constraint(equalTo: decorationsContainer.centerXAnchor),
             imageView.centerYAnchor.constraint(equalTo: decorationsContainer.centerYAnchor, constant: 10),
             imageView.widthAnchor.constraint(equalToConstant: 300),
             imageView.heightAnchor.constraint(equalToConstant: 300),
             
-            // White star (right)
             whiteStarView.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: -150),
             whiteStarView.centerYAnchor.constraint(equalTo: imageView.centerYAnchor, constant: 80),
             whiteStarView.widthAnchor.constraint(equalToConstant: 240),

@@ -10,13 +10,13 @@ import Foundation
 protocol ChatsWorkerProtocol {
     func fetchChats() async throws -> [ChatAPIModel]
     func fetchArchivedChats() async throws -> [ChatAPIModel]
-    func fetchChatById(chatId: String) async throws -> ChatAPIModel
-    func archiveChat(chatId: String) async throws
-    func unarchiveChat(chatId: String) async throws
-    func markChatRead(chatId: String) async throws
-    func deleteChat(chatId: String) async throws
-    func fetchMessages(chatId: String) async throws -> [MessageAPIModel]
-    func sendMessage(chatId: String, content: String, type: String) async throws -> MessageAPIModel
+    func archiveChat(chatId: Int) async throws
+    func unarchiveChat(chatId: Int) async throws
+    func markChatRead(chatId: Int) async throws
+    func deleteChat(chatId: Int) async throws
+    func fetchMessages(chatId: Int) async throws -> [MessageAPIModel]
+    func sendMessage(recipientId: Int, content: String) async throws -> SendMessageResponse
+    func sendMessageByUsername(username: String, content: String) async throws -> SendMessageResponse
 }
 
 final class ChatsWorker: ChatsWorkerProtocol {
@@ -24,55 +24,28 @@ final class ChatsWorker: ChatsWorkerProtocol {
     private let apiClient = APIClient.shared
     
     func fetchChats() async throws -> [ChatAPIModel] {
-        do {
-            let response: ChatListResponse = try await apiClient.request(
-                endpoint: "/chats",
-                method: .get,
-                requiresAuth: true,
-                responseType: ChatListResponse.self
-            )
-            return response.allChats.filter { $0.isArchived != true }
-        } catch {
-            let response: [ChatAPIModel] = try await apiClient.request(
-                endpoint: "/chats",
-                method: .get,
-                requiresAuth: true,
-                responseType: [ChatAPIModel].self
-            )
-            return response.filter { $0.isArchived != true }
-        }
+        let response: ChatsResponse = try await apiClient.request(
+            endpoint: "/chats?offset=0&limit=50",
+            method: .get,
+            requiresAuth: true,
+            responseType: ChatsResponse.self
+        )
+        // Filter to only in-inbox chats
+        return (response.chats ?? []).filter { $0.isInInbox == true }
     }
     
     func fetchArchivedChats() async throws -> [ChatAPIModel] {
-        do {
-            let response: ChatListResponse = try await apiClient.request(
-                endpoint: "/chats",
-                method: .get,
-                requiresAuth: true,
-                responseType: ChatListResponse.self
-            )
-            return response.allChats.filter { $0.isArchived == true }
-        } catch {
-            let response: [ChatAPIModel] = try await apiClient.request(
-                endpoint: "/chats",
-                method: .get,
-                requiresAuth: true,
-                responseType: [ChatAPIModel].self
-            )
-            return response.filter { $0.isArchived == true }
-        }
-    }
-    
-    func fetchChatById(chatId: String) async throws -> ChatAPIModel {
-        return try await apiClient.request(
-            endpoint: "/chats/\(chatId)",
+        let response: ChatsResponse = try await apiClient.request(
+            endpoint: "/chats?offset=0&limit=50",
             method: .get,
             requiresAuth: true,
-            responseType: ChatAPIModel.self
+            responseType: ChatsResponse.self
         )
+        // Filter to archived (not in inbox)
+        return (response.chats ?? []).filter { $0.isInInbox != true }
     }
     
-    func archiveChat(chatId: String) async throws {
+    func archiveChat(chatId: Int) async throws {
         let _: EmptyResponse = try await apiClient.request(
             endpoint: "/chats/\(chatId)/archive",
             method: .put,
@@ -81,7 +54,7 @@ final class ChatsWorker: ChatsWorkerProtocol {
         )
     }
     
-    func unarchiveChat(chatId: String) async throws {
+    func unarchiveChat(chatId: Int) async throws {
         let _: EmptyResponse = try await apiClient.request(
             endpoint: "/chats/\(chatId)/inbox",
             method: .put,
@@ -90,7 +63,7 @@ final class ChatsWorker: ChatsWorkerProtocol {
         )
     }
     
-    func markChatRead(chatId: String) async throws {
+    func markChatRead(chatId: Int) async throws {
         let _: EmptyResponse = try await apiClient.request(
             endpoint: "/chats/\(chatId)/read",
             method: .post,
@@ -99,7 +72,7 @@ final class ChatsWorker: ChatsWorkerProtocol {
         )
     }
     
-    func deleteChat(chatId: String) async throws {
+    func deleteChat(chatId: Int) async throws {
         let _: EmptyResponse = try await apiClient.request(
             endpoint: "/chats/\(chatId)",
             method: .delete,
@@ -108,39 +81,39 @@ final class ChatsWorker: ChatsWorkerProtocol {
         )
     }
     
-    func fetchMessages(chatId: String) async throws -> [MessageAPIModel] {
-        return try await apiClient.request(
+    func fetchMessages(chatId: Int) async throws -> [MessageAPIModel] {
+        let response: [MessageAPIModel] = try await apiClient.request(
             endpoint: "/chats/\(chatId)/messages",
             method: .get,
             requiresAuth: true,
             responseType: [MessageAPIModel].self
         )
+        return response
     }
     
-    func sendMessage(chatId: String, content: String, type: String = "text") async throws -> MessageAPIModel {
-        let bodyWithRecipient = SendMessageRequest(chatId: chatId, content: content, type: type)
-        let bodyData = try JSONEncoder().encode(bodyWithRecipient)
+    func sendMessage(recipientId: Int, content: String) async throws -> SendMessageResponse {
+        let body = SendMessageRequest(recipientId: recipientId, content: content)
+        let bodyData = try JSONEncoder().encode(body)
         
-        do {
-            return try await apiClient.request(
-                endpoint: "/chats/messages",
-                method: .post,
-                body: bodyData,
-                requiresAuth: true,
-                responseType: MessageAPIModel.self
-            )
-        } catch {
-            let bodyWithChatId = SendMessageRequest(chatId: chatId, content: content, type: type)
-            let bodyData2 = try JSONEncoder().encode(bodyWithChatId)
-            
-            return try await apiClient.request(
-                endpoint: "/chats/messages",
-                method: .post,
-                body: bodyData2,
-                requiresAuth: true,
-                responseType: MessageAPIModel.self
-            )
-        }
+        return try await apiClient.request(
+            endpoint: "/chats/messages",
+            method: .post,
+            body: bodyData,
+            requiresAuth: true,
+            responseType: SendMessageResponse.self
+        )
+    }
+    
+    func sendMessageByUsername(username: String, content: String) async throws -> SendMessageResponse {
+        let body = SendMessageRequest(username: username, content: content)
+        let bodyData = try JSONEncoder().encode(body)
+        
+        return try await apiClient.request(
+            endpoint: "/chats/messages",
+            method: .post,
+            body: bodyData,
+            requiresAuth: true,
+            responseType: SendMessageResponse.self
+        )
     }
 }
-struct EmptyResponse: Codable {}

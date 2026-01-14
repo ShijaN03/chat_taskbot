@@ -8,64 +8,44 @@
 import Foundation
 
 struct UserSearchResponse: Codable {
-    let users: [UserAPIModel]?
+    let total: Int?
+    let offset: Int?
+    let limit: Int?
+    let count: Int?
+    let filter: UserSearchFilter?
     let items: [UserAPIModel]?
     
     var allUsers: [UserAPIModel] {
-        return users ?? items ?? []
+        return items ?? []
     }
 }
 
+struct UserSearchFilter: Codable {
+}
+
 struct UserAPIModel: Codable {
-    let id: String
-    let username: String?
-    let displayName: String?
+    let id: Int
+    let name: String?
+    let telegramUsername: String?
     let avatar: String?
-    let avatarUrl: String?
-    let accountType: String?
-    let isVerified: Bool?
-    let bio: String?
-    let followersCount: Int?
-    let followingCount: Int?
     
     enum CodingKeys: String, CodingKey {
-        case id
-        case username
-        case displayName = "display_name"
-        case avatar
-        case avatarUrl = "avatar_url"
-        case accountType = "account_type"
-        case isVerified = "is_verified"
-        case bio
-        case followersCount = "followers_count"
-        case followingCount = "following_count"
-    }
-    
-    var resolvedAvatarURL: String? {
-        return avatarUrl ?? avatar
+        case id, name, avatar
+        case telegramUsername = "telegram_username"
     }
 }
 
 struct UserProfileResponse: Codable {
-    let id: String
-    let username: String?
-    let displayName: String?
+    let id: Int
+    let name: String?
+    let telegramUsername: String?
     let avatar: String?
-    let avatarUrl: String?
-    let accountType: String?
-    let isVerified: Bool?
     let bio: String?
     let createdAt: String?
     
     enum CodingKeys: String, CodingKey {
-        case id
-        case username
-        case displayName = "display_name"
-        case avatar
-        case avatarUrl = "avatar_url"
-        case accountType = "account_type"
-        case isVerified = "is_verified"
-        case bio
+        case id, name, avatar, bio
+        case telegramUsername = "telegram_username"
         case createdAt = "created_at"
     }
 }

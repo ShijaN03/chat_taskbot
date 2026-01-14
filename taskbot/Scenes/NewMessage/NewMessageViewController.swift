@@ -58,6 +58,7 @@ final class NewMessageViewController: UIViewController, NewMessageViewProtocol {
         textField.placeholder = "Поиск"
         textField.textColor = .white
         textField.font = .systemFont(ofSize: 16)
+        textField.textAlignment = .left
         textField.attributedPlaceholder = NSAttributedString(string: "Поиск", attributes: [.foregroundColor: UIColor.gray])
         textField.delegate = self
         textField.addTarget(self, action: #selector(searchTextChanged), for: .editingChanged)
