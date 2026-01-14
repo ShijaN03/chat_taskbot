@@ -142,7 +142,7 @@ final class ChatCell: UITableViewCell {
             unreadBadge.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             unreadBadge.centerYAnchor.constraint(equalTo: lastMessageLabel.centerYAnchor),
             unreadBadge.heightAnchor.constraint(equalToConstant: 20),
-            unreadBadge.widthAnchor.constraint(greaterThanOrEqualToConstant: 20),
+            unreadBadge.widthAnchor.constraint(equalToConstant: 20),
             unreadCountLabel.topAnchor.constraint(equalTo: unreadBadge.topAnchor),
             unreadCountLabel.bottomAnchor.constraint(equalTo: unreadBadge.bottomAnchor),
             unreadCountLabel.leadingAnchor.constraint(equalTo: unreadBadge.leadingAnchor, constant: 6),

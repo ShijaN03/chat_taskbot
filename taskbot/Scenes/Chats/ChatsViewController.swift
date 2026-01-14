@@ -162,6 +162,11 @@ final class ChatsViewController: UIViewController, ChatsViewProtocol {
         super.viewDidLoad()
         setupUI()
         presenter?.viewDidLoad()
+        
+        // TODO: Enable when WebSocket endpoint is confirmed
+        // if KeychainService.shared.isAuthenticated {
+        //     setupChatWebSocket()
+        // }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -436,5 +441,35 @@ extension ChatsViewController: CustomTabBarDelegate {
     
     func didSelectTab(_ index: Int) {
 
+    }
+}
+
+extension ChatsViewController: ChatWebSocketDelegate {
+    
+    func setupChatWebSocket() {
+        ChatWebSocketManager.shared.delegate = self
+        ChatWebSocketManager.shared.connectToAllChats()
+    }
+    
+    func chatWebSocketDidConnect() {
+        print("✅ Ready to receive messages")
+    }
+    
+    func chatWebSocketDidReceiveMessage(_ message: ChatMessageEvent) {
+        print("📩 NEW MESSAGE RECEIVED:")
+        print("   Type: \(message.type ?? "unknown")")
+        print("   Chat ID: \(message.chatId ?? "unknown")")
+        print("   Sender: \(message.senderId ?? "unknown")")
+        print("   Content: \(message.content ?? message.message?.content ?? "no content")")
+        
+        presenter?.viewDidLoad()
+    }
+    
+    func chatWebSocketDidDisconnect() {
+        print("🔌 Chat WebSocket disconnected")
+    }
+    
+    func chatWebSocketDidFail(with error: Error) {
+        print("❌ Chat WebSocket error: \(error.localizedDescription)")
     }
 }

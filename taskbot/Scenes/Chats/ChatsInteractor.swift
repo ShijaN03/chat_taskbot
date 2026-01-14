@@ -21,10 +21,8 @@ final class ChatsInteractor: ChatsInteractorInputProtocol {
     func fetchChats() {
         // Skip API if not authenticated
         guard KeychainService.shared.isAuthenticated else {
-            print("ℹ️ Not authenticated, using mock data")
-            let mockChats = createMockChats()
-            allChats = mockChats.filter { !$0.isArchived }
-            presenter?.didFetchChats(allChats)
+            print("⚠️ Not authenticated - cannot load chats")
+            presenter?.didFetchChats([])
             return
         }
         
@@ -39,12 +37,9 @@ final class ChatsInteractor: ChatsInteractorInputProtocol {
                     presenter?.didFetchChats(entities)
                 }
             } catch {
-                print("⚠️ API error, using mock data: \(error.localizedDescription)")
-                let mockChats = createMockChats()
-                allChats = mockChats.filter { !$0.isArchived }
-                
+                print("❌ Failed to load chats: \(error.localizedDescription)")
                 await MainActor.run {
-                    presenter?.didFetchChats(allChats)
+                    presenter?.didFetchChats([])
                 }
             }
         }
@@ -66,8 +61,7 @@ final class ChatsInteractor: ChatsInteractorInputProtocol {
     
     func fetchArchivedChats() {
         guard KeychainService.shared.isAuthenticated else {
-            let archivedChats = createMockChats().filter { $0.isArchived }
-            presenter?.didFetchChats(archivedChats)
+            presenter?.didFetchChats([])
             return
         }
         
@@ -80,9 +74,9 @@ final class ChatsInteractor: ChatsInteractorInputProtocol {
                     presenter?.didFetchChats(entities)
                 }
             } catch {
-                let archivedChats = createMockChats().filter { $0.isArchived }
+                print("❌ Failed to load archived chats: \(error.localizedDescription)")
                 await MainActor.run {
-                    presenter?.didFetchChats(archivedChats)
+                    presenter?.didFetchChats([])
                 }
             }
         }

@@ -20,20 +20,16 @@ final class NewMessageInteractor: NewMessageInteractorInputProtocol {
         Task {
             do {
                 let apiUsers = try await worker.getRecommendedUsers()
+                print("👥 Loaded \(apiUsers.count) recommended users")
                 let users = apiUsers.map { mapToEntity($0) }
                 
                 await MainActor.run {
-                    if users.isEmpty {
-                        // Fallback to mock data if API returns empty
-                        presenter?.didFetchRecommendedUsers(createMockUsers())
-                    } else {
-                        presenter?.didFetchRecommendedUsers(users)
-                    }
+                    presenter?.didFetchRecommendedUsers(users)
                 }
             } catch {
-                // Fallback to mock data on error
+                print("❌ Failed to load recommended users: \(error.localizedDescription)")
                 await MainActor.run {
-                    presenter?.didFetchRecommendedUsers(createMockUsers())
+                    presenter?.didFetchRecommendedUsers([])
                 }
             }
         }
@@ -48,30 +44,16 @@ final class NewMessageInteractor: NewMessageInteractorInputProtocol {
         Task {
             do {
                 let apiUsers = try await worker.searchUsers(query: query)
+                print("🔍 Found \(apiUsers.count) users for query: \(query)")
                 let users = apiUsers.map { mapToEntity($0) }
                 
                 await MainActor.run {
-                    if users.isEmpty {
-                        // Fallback to local filtering of mock data
-                        let mockUsers = createMockUsers()
-                        let filtered = mockUsers.filter {
-                            $0.username.lowercased().contains(query.lowercased()) ||
-                            ($0.displayName?.lowercased().contains(query.lowercased()) ?? false)
-                        }
-                        presenter?.didSearchUsers(filtered)
-                    } else {
-                        presenter?.didSearchUsers(users)
-                    }
+                    presenter?.didSearchUsers(users)
                 }
             } catch {
-                // Fallback to local filtering on error
+                print("❌ Search failed: \(error.localizedDescription)")
                 await MainActor.run {
-                    let mockUsers = createMockUsers()
-                    let filtered = mockUsers.filter {
-                        $0.username.lowercased().contains(query.lowercased()) ||
-                        ($0.displayName?.lowercased().contains(query.lowercased()) ?? false)
-                    }
-                    presenter?.didSearchUsers(filtered)
+                    presenter?.didSearchUsers([])
                 }
             }
         }
@@ -100,6 +82,15 @@ final class NewMessageInteractor: NewMessageInteractorInputProtocol {
     
     private func createMockUsers() -> [UserEntity] {
         return [
+            // Target user for testing
+            UserEntity(
+                id: "2",
+                username: "natfullin",
+                displayName: "Natfullin",
+                avatarURL: "https://picsum.photos/seed/natfullin/100/100",
+                accountType: .personal,
+                isVerified: true
+            ),
             UserEntity(
                 id: "1",
                 username: "anna_smile",
@@ -109,7 +100,7 @@ final class NewMessageInteractor: NewMessageInteractorInputProtocol {
                 isVerified: false
             ),
             UserEntity(
-                id: "2",
+                id: "3",
                 username: "photo_studio_pro",
                 displayName: "Фотостудия ProShot",
                 avatarURL: "https://picsum.photos/seed/studio/100/100",
@@ -117,7 +108,7 @@ final class NewMessageInteractor: NewMessageInteractorInputProtocol {
                 isVerified: true
             ),
             UserEntity(
-                id: "3",
+                id: "4",
                 username: "travel_maria",
                 displayName: "Мария",
                 avatarURL: "https://picsum.photos/seed/maria/100/100",
@@ -125,20 +116,12 @@ final class NewMessageInteractor: NewMessageInteractorInputProtocol {
                 isVerified: false
             ),
             UserEntity(
-                id: "4",
+                id: "5",
                 username: "coffee_house",
                 displayName: "Coffee House",
                 avatarURL: "https://picsum.photos/seed/coffee/100/100",
                 accountType: .business,
                 isVerified: true
-            ),
-            UserEntity(
-                id: "5",
-                username: "dmitry_dev",
-                displayName: "Дмитрий",
-                avatarURL: "https://picsum.photos/seed/dmitry/100/100",
-                accountType: .personal,
-                isVerified: false
             )
         ]
     }

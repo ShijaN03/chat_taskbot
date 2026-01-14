@@ -73,8 +73,8 @@ final class LoginViewController: UIViewController {
     private lazy var descriptionLabel: UILabel = {
         let label = UILabel()
         label.text = "Вход в приложение осуществляется\nчерез аккаунт в Telegram"
-        label.font = .systemFont(ofSize: 14, weight: .regular)
-        label.textColor = .gray
+        label.font = .systemFont(ofSize: 16, weight: .regular)
+        label.textColor = .lightGray
         label.textAlignment = .center
         label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -96,7 +96,7 @@ final class LoginViewController: UIViewController {
         button.setTitle("Войти в приложение", for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
-        button.backgroundColor = UIColor(red: 0.25, green: 0.45, blue: 0.95, alpha: 1)
+        button.backgroundColor = UIColor(red: 47/255, green: 127/255, blue: 255/255, alpha: 1)
         button.layer.cornerRadius = 12
         button.addTarget(self, action: #selector(loginTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -108,7 +108,7 @@ final class LoginViewController: UIViewController {
         button.setTitle("Зарегистрироваться", for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .regular)
-        button.backgroundColor = UIColor(white: 0.2, alpha: 1)
+        button.backgroundColor = UIColor(red: 84/255, green: 85/255, blue: 91/255, alpha: 1)
         button.layer.cornerRadius = 12
         button.layer.borderWidth = 1
         button.layer.borderColor = UIColor(white: 0.3, alpha: 1).cgColor
@@ -121,7 +121,7 @@ final class LoginViewController: UIViewController {
         let label = UILabel()
         label.text = "При входе или регистрации вы соглашаетесь\nс нашей Политикой использования"
         label.font = .systemFont(ofSize: 11, weight: .regular)
-        label.textColor = .gray
+        label.textColor = .lightGray
         label.textAlignment = .center
         label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -140,7 +140,7 @@ final class LoginViewController: UIViewController {
     }
     
     private func setupUI() {
-        view.backgroundColor = UIColor(red: 0.12, green: 0.12, blue: 0.14, alpha: 1)
+        view.backgroundColor = UIColor(red: 37/255, green: 40/255, blue: 45/255, alpha: 1)
         
         view.addSubview(authContainer)
         authContainer.addSubview(bluestarView)
@@ -158,7 +158,7 @@ final class LoginViewController: UIViewController {
         
         NSLayoutConstraint.activate([
             // Auth container
-            authContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 40),
+            authContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 130),
             authContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             authContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             authContainer.heightAnchor.constraint(equalToConstant: 260),
@@ -166,28 +166,28 @@ final class LoginViewController: UIViewController {
             // Blue star (centered, main element)
             bluestarView.centerXAnchor.constraint(equalTo: authContainer.centerXAnchor),
             bluestarView.centerYAnchor.constraint(equalTo: authContainer.centerYAnchor),
-            bluestarView.widthAnchor.constraint(equalToConstant: 200),
-            bluestarView.heightAnchor.constraint(equalToConstant: 200),
+            bluestarView.widthAnchor.constraint(equalToConstant: 270),
+            bluestarView.heightAnchor.constraint(equalToConstant: 270),
             
             // Flower (top left of bluestar)
-            flowerView.trailingAnchor.constraint(equalTo: bluestarView.leadingAnchor, constant: 40),
-            flowerView.topAnchor.constraint(equalTo: bluestarView.topAnchor, constant: -20),
-            flowerView.widthAnchor.constraint(equalToConstant: 60),
-            flowerView.heightAnchor.constraint(equalToConstant: 60),
+            flowerView.trailingAnchor.constraint(equalTo: bluestarView.leadingAnchor, constant: 80),
+            flowerView.topAnchor.constraint(equalTo: bluestarView.topAnchor, constant: 40),
+            flowerView.widthAnchor.constraint(equalToConstant: 80),
+            flowerView.heightAnchor.constraint(equalToConstant: 80),
             
             // Hand (right side of bluestar)
-            handView.leadingAnchor.constraint(equalTo: bluestarView.trailingAnchor, constant: -30),
-            handView.topAnchor.constraint(equalTo: bluestarView.topAnchor, constant: 30),
-            handView.widthAnchor.constraint(equalToConstant: 50),
-            handView.heightAnchor.constraint(equalToConstant: 70),
+            handView.leadingAnchor.constraint(equalTo: bluestarView.trailingAnchor, constant: -100),
+            handView.topAnchor.constraint(equalTo: bluestarView.topAnchor, constant: 70),
+            handView.widthAnchor.constraint(equalToConstant: 70),
+            handView.heightAnchor.constraint(equalToConstant: 90),
             
             // Message (left bottom of bluestar)
             messageView.trailingAnchor.constraint(equalTo: bluestarView.leadingAnchor, constant: 50),
             messageView.bottomAnchor.constraint(equalTo: bluestarView.bottomAnchor, constant: -30),
-            messageView.widthAnchor.constraint(equalToConstant: 70),
-            messageView.heightAnchor.constraint(equalToConstant: 50),
+            messageView.widthAnchor.constraint(equalToConstant: 90),
+            messageView.heightAnchor.constraint(equalToConstant: 70),
             
-            titleLabel.topAnchor.constraint(equalTo: authContainer.bottomAnchor, constant: 24),
+            titleLabel.topAnchor.constraint(equalTo: authContainer.bottomAnchor, constant: 48),
             titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
             titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
             

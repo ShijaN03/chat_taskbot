@@ -11,7 +11,6 @@ final class OnboardingPageView: UIView {
     
     private var pageIndex: Int = 0
     
-    // Container for all decorative elements
     private lazy var decorationsContainer: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -30,7 +29,7 @@ final class OnboardingPageView: UIView {
     
     private lazy var descriptionLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 14, weight: .regular)
+        label.font = .systemFont(ofSize: 16, weight: .regular)
         label.textColor = .gray
         label.textAlignment = .center
         label.numberOfLines = 0
@@ -40,6 +39,7 @@ final class OnboardingPageView: UIView {
     
     private lazy var progressImageView: UIImageView = {
         let imageView = UIImageView()
+        imageView.isHidden = true 
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
@@ -63,7 +63,7 @@ final class OnboardingPageView: UIView {
         addSubview(descriptionLabel)
         
         NSLayoutConstraint.activate([
-            decorationsContainer.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+            decorationsContainer.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 50),
             decorationsContainer.leadingAnchor.constraint(equalTo: leadingAnchor),
             decorationsContainer.trailingAnchor.constraint(equalTo: trailingAnchor),
             decorationsContainer.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 0.55),
@@ -118,28 +118,28 @@ final class OnboardingPageView: UIView {
         
         NSLayoutConstraint.activate([
             // Star (right side, large white)
-            starView.trailingAnchor.constraint(equalTo: decorationsContainer.trailingAnchor, constant: -20),
+            starView.trailingAnchor.constraint(equalTo: decorationsContainer.trailingAnchor, constant: 20),
             starView.centerYAnchor.constraint(equalTo: decorationsContainer.centerYAnchor, constant: 20),
-            starView.widthAnchor.constraint(equalToConstant: 160),
-            starView.heightAnchor.constraint(equalToConstant: 160),
+            starView.widthAnchor.constraint(equalToConstant: 270),
+            starView.heightAnchor.constraint(equalToConstant: 270),
             
             // Headphones (left side)
             headphonesView.leadingAnchor.constraint(equalTo: decorationsContainer.leadingAnchor, constant: 30),
             headphonesView.topAnchor.constraint(equalTo: decorationsContainer.topAnchor, constant: 60),
-            headphonesView.widthAnchor.constraint(equalToConstant: 140),
-            headphonesView.heightAnchor.constraint(equalToConstant: 140),
+            headphonesView.widthAnchor.constraint(equalToConstant: 200),
+            headphonesView.heightAnchor.constraint(equalToConstant: 200),
             
             // Flower (top right of headphones)
-            flowerView.leadingAnchor.constraint(equalTo: headphonesView.trailingAnchor, constant: -20),
+            flowerView.leadingAnchor.constraint(equalTo: headphonesView.trailingAnchor, constant: -80),
             flowerView.topAnchor.constraint(equalTo: decorationsContainer.topAnchor, constant: 40),
-            flowerView.widthAnchor.constraint(equalToConstant: 50),
-            flowerView.heightAnchor.constraint(equalToConstant: 50),
+            flowerView.widthAnchor.constraint(equalToConstant: 70),
+            flowerView.heightAnchor.constraint(equalToConstant: 70),
             
             // Circle (under headphones)
-            circleView.leadingAnchor.constraint(equalTo: headphonesView.leadingAnchor, constant: 20),
-            circleView.topAnchor.constraint(equalTo: headphonesView.bottomAnchor, constant: -30),
-            circleView.widthAnchor.constraint(equalToConstant: 80),
-            circleView.heightAnchor.constraint(equalToConstant: 40)
+            circleView.leadingAnchor.constraint(equalTo: headphonesView.leadingAnchor, constant: 80),
+            circleView.topAnchor.constraint(equalTo: headphonesView.bottomAnchor, constant: -15),
+            circleView.widthAnchor.constraint(equalToConstant: 100),
+            circleView.heightAnchor.constraint(equalToConstant: 50)
         ])
     }
     
@@ -164,30 +164,30 @@ final class OnboardingPageView: UIView {
             waveView.leadingAnchor.constraint(equalTo: decorationsContainer.leadingAnchor),
             waveView.trailingAnchor.constraint(equalTo: decorationsContainer.trailingAnchor),
             waveView.bottomAnchor.constraint(equalTo: decorationsContainer.bottomAnchor),
-            waveView.heightAnchor.constraint(equalToConstant: 180),
+            waveView.heightAnchor.constraint(equalToConstant: 400),
             
             // Photo (centered)
             imageView.centerXAnchor.constraint(equalTo: decorationsContainer.centerXAnchor),
             imageView.centerYAnchor.constraint(equalTo: decorationsContainer.centerYAnchor, constant: -20),
-            imageView.widthAnchor.constraint(equalToConstant: 220),
-            imageView.heightAnchor.constraint(equalToConstant: 220),
+            imageView.widthAnchor.constraint(equalToConstant: 290),
+            imageView.heightAnchor.constraint(equalToConstant: 260),
             
             // Hearts (left side)
             heartBoldView.trailingAnchor.constraint(equalTo: imageView.leadingAnchor, constant: 10),
-            heartBoldView.topAnchor.constraint(equalTo: imageView.topAnchor, constant: 20),
-            heartBoldView.widthAnchor.constraint(equalToConstant: 60),
-            heartBoldView.heightAnchor.constraint(equalToConstant: 80),
+            heartBoldView.topAnchor.constraint(equalTo: imageView.topAnchor, constant: 40),
+            heartBoldView.widthAnchor.constraint(equalToConstant: 50),
+            heartBoldView.heightAnchor.constraint(equalToConstant: 60),
             
-            heartThinView.trailingAnchor.constraint(equalTo: heartBoldView.leadingAnchor, constant: 15),
-            heartThinView.topAnchor.constraint(equalTo: heartBoldView.bottomAnchor, constant: -30),
-            heartThinView.widthAnchor.constraint(equalToConstant: 40),
-            heartThinView.heightAnchor.constraint(equalToConstant: 50),
+            heartThinView.trailingAnchor.constraint(equalTo: heartBoldView.leadingAnchor, constant: 90),
+            heartThinView.topAnchor.constraint(equalTo: heartBoldView.bottomAnchor, constant: -140),
+            heartThinView.widthAnchor.constraint(equalToConstant: 80),
+            heartThinView.heightAnchor.constraint(equalToConstant: 100),
             
             // Message (top right)
-            messageView.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: -20),
-            messageView.bottomAnchor.constraint(equalTo: imageView.topAnchor, constant: 30),
-            messageView.widthAnchor.constraint(equalToConstant: 70),
-            messageView.heightAnchor.constraint(equalToConstant: 50)
+            messageView.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: -80),
+            messageView.bottomAnchor.constraint(equalTo: imageView.topAnchor, constant: 60),
+            messageView.widthAnchor.constraint(equalToConstant: 140),
+            messageView.heightAnchor.constraint(equalToConstant: 100)
         ])
     }
     
@@ -209,26 +209,26 @@ final class OnboardingPageView: UIView {
             // Blue wave/star (top)
             blueStarView.topAnchor.constraint(equalTo: decorationsContainer.topAnchor, constant: 30),
             blueStarView.centerXAnchor.constraint(equalTo: decorationsContainer.centerXAnchor, constant: 20),
-            blueStarView.widthAnchor.constraint(equalToConstant: 200),
-            blueStarView.heightAnchor.constraint(equalToConstant: 80),
+            blueStarView.widthAnchor.constraint(equalToConstant: 600),
+            blueStarView.heightAnchor.constraint(equalToConstant: 300),
             
             // Photo (centered)
             imageView.centerXAnchor.constraint(equalTo: decorationsContainer.centerXAnchor),
-            imageView.centerYAnchor.constraint(equalTo: decorationsContainer.centerYAnchor, constant: 10),
-            imageView.widthAnchor.constraint(equalToConstant: 200),
-            imageView.heightAnchor.constraint(equalToConstant: 200),
+            imageView.centerYAnchor.constraint(equalTo: decorationsContainer.centerYAnchor, constant: 40),
+            imageView.widthAnchor.constraint(equalToConstant: 300),
+            imageView.heightAnchor.constraint(equalToConstant: 300),
             
             // Spiral (left bottom)
-            spiralView.trailingAnchor.constraint(equalTo: imageView.leadingAnchor, constant: 30),
+            spiralView.trailingAnchor.constraint(equalTo: imageView.leadingAnchor, constant: 60),
             spiralView.topAnchor.constraint(equalTo: imageView.centerYAnchor, constant: -20),
-            spiralView.widthAnchor.constraint(equalToConstant: 100),
-            spiralView.heightAnchor.constraint(equalToConstant: 120),
+            spiralView.widthAnchor.constraint(equalToConstant: 150),
+            spiralView.heightAnchor.constraint(equalToConstant: 250),
             
             // White star (right bottom)
-            starView.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: -40),
-            starView.topAnchor.constraint(equalTo: imageView.centerYAnchor, constant: 10),
-            starView.widthAnchor.constraint(equalToConstant: 100),
-            starView.heightAnchor.constraint(equalToConstant: 100)
+            starView.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: -100),
+            starView.topAnchor.constraint(equalTo: imageView.centerYAnchor, constant: 30),
+            starView.widthAnchor.constraint(equalToConstant: 150),
+            starView.heightAnchor.constraint(equalToConstant: 150)
         ])
     }
     
@@ -240,28 +240,28 @@ final class OnboardingPageView: UIView {
         let imageView = createImageView(named: "ob4_image")
         let whiteStarView = createImageView(named: "ob4_whitestar")
         
-        decorationsContainer.addSubview(blueStarView)
         decorationsContainer.addSubview(imageView)
+        decorationsContainer.addSubview(blueStarView)
         decorationsContainer.addSubview(whiteStarView)
         
         NSLayoutConstraint.activate([
             // Blue star (top left)
             blueStarView.leadingAnchor.constraint(equalTo: decorationsContainer.leadingAnchor, constant: 20),
             blueStarView.topAnchor.constraint(equalTo: decorationsContainer.topAnchor, constant: 40),
-            blueStarView.widthAnchor.constraint(equalToConstant: 120),
-            blueStarView.heightAnchor.constraint(equalToConstant: 120),
+            blueStarView.widthAnchor.constraint(equalToConstant: 160),
+            blueStarView.heightAnchor.constraint(equalToConstant: 160),
             
             // Photo (centered)
             imageView.centerXAnchor.constraint(equalTo: decorationsContainer.centerXAnchor),
             imageView.centerYAnchor.constraint(equalTo: decorationsContainer.centerYAnchor, constant: 10),
-            imageView.widthAnchor.constraint(equalToConstant: 200),
-            imageView.heightAnchor.constraint(equalToConstant: 240),
+            imageView.widthAnchor.constraint(equalToConstant: 300),
+            imageView.heightAnchor.constraint(equalToConstant: 300),
             
             // White star (right)
-            whiteStarView.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: -50),
-            whiteStarView.centerYAnchor.constraint(equalTo: imageView.centerYAnchor, constant: 40),
-            whiteStarView.widthAnchor.constraint(equalToConstant: 120),
-            whiteStarView.heightAnchor.constraint(equalToConstant: 120)
+            whiteStarView.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: -150),
+            whiteStarView.centerYAnchor.constraint(equalTo: imageView.centerYAnchor, constant: 80),
+            whiteStarView.widthAnchor.constraint(equalToConstant: 240),
+            whiteStarView.heightAnchor.constraint(equalToConstant: 240)
         ])
     }
     

@@ -72,7 +72,7 @@ final class OnboardingViewController: UIViewController {
         button.setTitle("Далее", for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
-        button.backgroundColor = UIColor(red: 0.25, green: 0.45, blue: 0.95, alpha: 1)
+        button.backgroundColor = UIColor(red: 47/255, green: 127/255, blue: 255/255, alpha: 1)
         button.layer.cornerRadius = 12
         button.addTarget(self, action: #selector(nextTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -84,7 +84,7 @@ final class OnboardingViewController: UIViewController {
         button.setTitle("Пропустить", for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .regular)
-        button.backgroundColor = UIColor(white: 0.2, alpha: 1)
+        button.backgroundColor = UIColor(red: 84/255, green: 85/255, blue: 91/255, alpha: 1)
         button.layer.cornerRadius = 12
         button.layer.borderWidth = 1
         button.layer.borderColor = UIColor(white: 0.3, alpha: 1).cgColor
@@ -100,7 +100,7 @@ final class OnboardingViewController: UIViewController {
     }
     
     private func setupUI() {
-        view.backgroundColor = UIColor(red: 0.08, green: 0.08, blue: 0.1, alpha: 1)
+        view.backgroundColor = UIColor(red: 37/255, green: 40/255, blue: 45/255, alpha: 1)
         
         view.addSubview(scrollView)
         scrollView.addSubview(contentStackView)

@@ -60,6 +60,11 @@ final class APIClient {
             )
         }
         guard (200...299).contains(httpResponse.statusCode) else {
+            // Log error response for debugging
+            if let responseString = String(data: data, encoding: .utf8) {
+                print("❌ API Error \(httpResponse.statusCode) for \(endpoint):")
+                print("   Response: \(responseString.prefix(500))")
+            }
             if let apiError = try? JSONDecoder().decode(APIError.self, from: data) {
                 throw APIClientError.apiError(apiError)
             }

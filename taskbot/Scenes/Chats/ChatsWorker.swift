@@ -24,7 +24,6 @@ final class ChatsWorker: ChatsWorkerProtocol {
     private let apiClient = APIClient.shared
     
     func fetchChats() async throws -> [ChatAPIModel] {
-        // Try wrapped response first, then direct array
         do {
             let response: ChatListResponse = try await apiClient.request(
                 endpoint: "/chats",
@@ -34,7 +33,6 @@ final class ChatsWorker: ChatsWorkerProtocol {
             )
             return response.allChats.filter { $0.isArchived != true }
         } catch {
-            // Fallback to direct array
             let response: [ChatAPIModel] = try await apiClient.request(
                 endpoint: "/chats",
                 method: .get,
@@ -120,16 +118,29 @@ final class ChatsWorker: ChatsWorkerProtocol {
     }
     
     func sendMessage(chatId: String, content: String, type: String = "text") async throws -> MessageAPIModel {
-        let body = SendMessageRequest(chatId: chatId, content: content, type: type)
-        let bodyData = try JSONEncoder().encode(body)
+        let bodyWithRecipient = SendMessageRequest(chatId: chatId, content: content, type: type)
+        let bodyData = try JSONEncoder().encode(bodyWithRecipient)
         
-        return try await apiClient.request(
-            endpoint: "/chats/messages",
-            method: .post,
-            body: bodyData,
-            requiresAuth: true,
-            responseType: MessageAPIModel.self
-        )
+        do {
+            return try await apiClient.request(
+                endpoint: "/chats/messages",
+                method: .post,
+                body: bodyData,
+                requiresAuth: true,
+                responseType: MessageAPIModel.self
+            )
+        } catch {
+            let bodyWithChatId = SendMessageRequest(chatId: chatId, content: content, type: type)
+            let bodyData2 = try JSONEncoder().encode(bodyWithChatId)
+            
+            return try await apiClient.request(
+                endpoint: "/chats/messages",
+                method: .post,
+                body: bodyData2,
+                requiresAuth: true,
+                responseType: MessageAPIModel.self
+            )
+        }
     }
 }
 struct EmptyResponse: Codable {}

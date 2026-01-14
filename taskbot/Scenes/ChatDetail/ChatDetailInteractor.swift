@@ -23,45 +23,38 @@ final class ChatDetailInteractor: ChatDetailInteractorInputProtocol {
         Task {
             do {
                 let apiMessages = try await worker.fetchMessages(chatId: chatId)
+                print("📬 Loaded \(apiMessages.count) messages from API")
                 let entities = apiMessages.map { mapToEntity($0) }
                 
                 await MainActor.run {
                     presenter?.didFetchMessages(entities)
                 }
             } catch {
-                let mockMessages = createMockMessages()
+                print("❌ Failed to load messages: \(error.localizedDescription)")
                 await MainActor.run {
-                    presenter?.didFetchMessages(mockMessages)
+                    // Show empty state instead of mock data
+                    presenter?.didFetchMessages([])
                 }
             }
         }
     }
     
     func sendMessage(chatId: String, text: String) {
+        print("📤 Sending message to recipient \(chatId): \(text)")
+        
         Task {
             do {
                 let apiMessage = try await worker.sendMessage(chatId: chatId, content: text, type: "text")
+                print("✅ Message sent successfully! ID: \(apiMessage.id)")
                 let entity = mapToEntity(apiMessage)
                 
                 await MainActor.run {
                     presenter?.didSendMessage(entity)
                 }
             } catch {
-                let message = MessageEntity(
-                    id: UUID().uuidString,
-                    senderId: "me",
-                    isOutgoing: true,
-                    type: .text,
-                    content: text,
-                    mediaURL: nil,
-                    thumbnailURL: nil,
-                    createdAt: Date(),
-                    isRead: false,
-                    repostInfo: nil
-                )
-                
+                print("❌ Failed to send message: \(error.localizedDescription)")
                 await MainActor.run {
-                    presenter?.didSendMessage(message)
+                    presenter?.didFailSendingMessage(with: error)
                 }
             }
         }
